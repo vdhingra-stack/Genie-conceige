@@ -14,6 +14,8 @@ const MCP_BEARER_TOKEN = process.env.MCP_BEARER_TOKEN || ""; // if empty, auth i
 
 const LIGHT_PROVIDER = process.env.LIGHT_PROVIDER || "tuya";
 
+const PORT = process.env.PORT || 8000;
+
 function timingSafeEq(a, b) {
   const ab = Buffer.from(a);
   const bb = Buffer.from(b);
@@ -270,6 +272,11 @@ function createMcpServerForSession() {
   return mcp;
 }
 
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // -------------------------
 // Streamable HTTP host with per-session server/transport
 // -------------------------
@@ -368,6 +375,7 @@ app.delete("/mcp", async (req, res) => {
   }
 });
 
-app.listen(8000, () => {
-  console.log("MCP server listening on http://127.0.0.1:8000/mcp");
+// Listen on 0.0.0.0 instead of 127.0.0.1 (required for Render)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`MCP server listening on port ${PORT}`);
 });
