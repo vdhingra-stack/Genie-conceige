@@ -4,7 +4,7 @@
   "description": "MCP Server for Genie Concierge",
   "main": "Scripts/mcp-server.cjs",
   "scripts": {
-    "start": "node Scripts/mcp-server.cjs",
+    "start": "node mcp-server.cjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
