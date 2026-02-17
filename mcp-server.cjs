@@ -272,16 +272,18 @@ function createMcpServerForSession() {
   return mcp;
 }
 
-// Health check endpoint for Render
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+
 
 // -------------------------
 // Streamable HTTP host with per-session server/transport
 // -------------------------
 const app = express();
 app.use(express.json());
+
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // sessionId -> { server, transport }
 const sessions = new Map();
