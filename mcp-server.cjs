@@ -151,56 +151,102 @@ function createMcpServerForSession() {
       },
     },
     async (args) => {
-      console.log("highlight_targets args:", JSON.stringify(args));
+      console.log("=== HIGHLIGHT_TARGETS START ===");
+      console.log("Args:", JSON.stringify(args));
 
       let cfg;
       try {
-        cfg = loadStoreConfig(args.store_id); // loads <STORE_CONFIG_DIR>/<store_id>.json
+        console.log("Loading store config for:", args.store_id);
+        cfg = loadStoreConfig(args.store_id);
+        console.log("Config loaded successfully");
+        console.log("Config targets:", Object.keys(cfg.targets || {}));
       } catch (e) {
-        return { content: [{ type: "text", text: JSON.stringify({ ok: false, error: "unknown_store", detail: String(e.message || e) }) }] };
+        console.error("ERROR loading config:", e.message);
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              ok: false,
+              error: "unknown_store",
+              detail: String(e.message || e)
+            })
+          }]
+        };
       }
 
       const targets = cfg.targets || {};
+      console.log("Available targets in config:", Object.keys(targets));
 
       const selected = args.targets
         .map((t) => {
+          console.log(`Processing target SKU: ${t.sku}`);
           const entry = targets[t.sku];
-          const providerCfg = resolveLightProviderCfg(entry); // e.g., { device_id: ... } for tuya
+          console.log(`Entry found:`, entry ? "YES" : "NO");
+
+          const providerCfg = resolveLightProviderCfg(entry);
+          console.log(`Provider config:`, providerCfg);
+
           return { sku: t.sku, providerCfg };
         })
         .filter((x) => !!x.providerCfg);
-        
-        const tuyaSelected = selected
-          .filter(x => LIGHT_PROVIDER === "tuya" && x.providerCfg?.device_id);
 
-        console.log("Selected targets:", JSON.stringify(selected));
-        console.log("Tuya selected:", JSON.stringify(tuyaSelected));
-        console.log("LIGHT_PROVIDER:", LIGHT_PROVIDER);
+      console.log("Selected after filtering:", JSON.stringify(selected));
+
+      const tuyaSelected = selected
+        .filter(x => LIGHT_PROVIDER === "tuya" && x.providerCfg?.device_id);
+
+      console.log("Tuya selected:", JSON.stringify(tuyaSelected));
+      console.log("LIGHT_PROVIDER:", LIGHT_PROVIDER);
 
       if (!tuyaSelected.length) {
-        console.log("ERROR: No targets mapped for provider");
-        return { content: [{ type: "text", text: JSON.stringify({ ok: false, error: "no_targets_mapped_for_provider", provider: LIGHT_PROVIDER }) }] };
+        console.error("ERROR: No targets mapped for provider");
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              ok: false,
+              error: "no_targets_mapped_for_provider",
+              provider: LIGHT_PROVIDER,
+              debug: {
+                requested_skus: args.targets.map(t => t.sku),
+                available_skus: Object.keys(targets),
+                selected_count: selected.length
+              }
+            })
+          }]
+        };
       }
 
       if (args.effect === "off") {
+        console.log("Turning off lights");
         tuyaSelected.forEach(x => stopTuyaPulse(x.providerCfg.device_id));
         await Promise.all(tuyaSelected.map(x => tuyaOff(x.providerCfg.device_id)));
         return {
           content: [{
             type: "text",
-            text: JSON.stringify({ ok: true, action: "off", provider: LIGHT_PROVIDER, targets: tuyaSelected.map(x => x.sku) })
+            text: JSON.stringify({
+              ok: true,
+              action: "off",
+              provider: LIGHT_PROVIDER,
+              targets: tuyaSelected.map(x => x.sku)
+            })
           }]
         };
       }
 
+      console.log("Starting pulse for devices:", tuyaSelected.map(x => x.providerCfg.device_id));
+
       tuyaSelected.forEach(x => {
+        console.log(`Starting pulse for device ${x.providerCfg.device_id}`);
         startTuyaPulse({
           deviceId: x.providerCfg.device_id,
           theme: args.theme,
           durationMs: args.duration_ms,
-          periodMs: 450, // slower is more reliable on Tuya cloud
+          periodMs: 450,
         });
       });
+
+      console.log("=== HIGHLIGHT_TARGETS END ===");
 
       return {
         content: [{
