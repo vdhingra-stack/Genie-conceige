@@ -103,9 +103,8 @@ const fs = require("fs");
 const path = require("path");
 
 const STORE_CONFIG_DIR = path.resolve(
-  process.env.STORE_CONFIG_DIR || path.join(process.cwd(), "MCP Server", "config", "stores")
+  process.env.STORE_CONFIG_DIR || path.join(__dirname, "..", "config", "stores")
 );
-
 const storeCache = new Map();
 
 function loadStoreConfig(storeId) {
