@@ -109,10 +109,47 @@ const STORE_CONFIG_DIR = path.resolve(
 const storeCache = new Map();
 
 function loadStoreConfig(storeId) {
-  // Cache by storeId; you can remove caching later if you want hot reload
+  // Cache by storeId
   if (storeCache.has(storeId)) return storeCache.get(storeId);
 
+  // Debug logging
+  console.log("=== CONFIG DEBUG ===");
+  console.log("__dirname:", __dirname);
+  console.log("process.cwd():", process.cwd());
+  console.log("STORE_CONFIG_DIR:", STORE_CONFIG_DIR);
+  
+  // List what's actually in the project root
+  try {
+    const projectRoot = path.resolve(__dirname, "..");
+    console.log("Project root:", projectRoot);
+    console.log("Contents of project root:", fs.readdirSync(projectRoot));
+    
+    // Check if MCP Server folder exists
+    const mcpServerPath = path.join(projectRoot, "MCP Server");
+    if (fs.existsSync(mcpServerPath)) {
+      console.log("MCP Server folder exists!");
+      console.log("Contents:", fs.readdirSync(mcpServerPath));
+      
+      const configPath = path.join(mcpServerPath, "config");
+      if (fs.existsSync(configPath)) {
+        console.log("config folder exists!");
+        console.log("Contents:", fs.readdirSync(configPath));
+        
+        const storesPath = path.join(configPath, "stores");
+        if (fs.existsSync(storesPath)) {
+          console.log("stores folder exists!");
+          console.log("Contents:", fs.readdirSync(storesPath));
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Debug error:", e.message);
+  }
+  console.log("=== END CONFIG DEBUG ===");
+
   const filePath = path.join(STORE_CONFIG_DIR, `${storeId}.json`);
+  console.log("Trying to load:", filePath);
+  
   const raw = fs.readFileSync(filePath, "utf8");
   const cfg = JSON.parse(raw);
 
