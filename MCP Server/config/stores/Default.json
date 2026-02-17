@@ -1,0 +1,62 @@
+{
+  "store_id": "Default",
+  "targets": {
+    "82712501": {
+      "providers": {
+        "tuya": {
+          "device_id": "bffcac71ddbc2f7d55a2yz"
+        }
+      }
+    },
+    "82712508": {
+      "providers": {
+        "tuya": {
+          "device_id": "bffcac71ddbc2f7d55a2yz"
+        }
+      }
+    },
+    "82711225": {
+      "providers": {
+        "tuya": {
+          "device_id": "bffcac71ddbc2f7d55a2yz"
+        }
+      }
+    },
+    "82722404": {
+      "providers": {
+        "tuya": {
+          "device_id": "bffcac71ddbc2f7d55a2yz"
+        }
+      }
+    },
+    "82716457": {
+      "providers": {
+        "tuya": {
+          "device_id": "bffcac71ddbc2f7d55a2yz"
+        }
+      }
+    },
+    "82717537": {
+      "providers": {
+        "tuya": {
+          "device_id": "bffcac71ddbc2f7d55a2yz"
+        }
+      }
+    },
+    "82711728": {
+      "providers": {
+        "tuya": {
+          "device_id": "bffcac71ddbc2f7d55a2yz"
+        }
+      }
+    },
+    "82717114": {
+      "providers": {
+        "tuya": {
+          "device_id": "bffcac71ddbc2f7d55a2yz"
+        }
+      }
+    }
+  }
+}
+

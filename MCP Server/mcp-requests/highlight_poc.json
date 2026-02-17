@@ -1,0 +1,12 @@
+{
+  "name": "highlight_targets",
+  "arguments": {
+    "store_id": "Default",
+    "targets": [
+      { "sku": "82711728", "mode": "light" }
+    ],
+    "effect": "pulse",
+    "theme":"battery",
+    "duration_ms": 8000
+  }
+}
