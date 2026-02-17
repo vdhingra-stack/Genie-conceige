@@ -173,7 +173,12 @@ function createMcpServerForSession() {
         const tuyaSelected = selected
           .filter(x => LIGHT_PROVIDER === "tuya" && x.providerCfg?.device_id);
 
+        console.log("Selected targets:", JSON.stringify(selected));
+        console.log("Tuya selected:", JSON.stringify(tuyaSelected));
+        console.log("LIGHT_PROVIDER:", LIGHT_PROVIDER);
+
       if (!tuyaSelected.length) {
+        console.log("ERROR: No targets mapped for provider");
         return { content: [{ type: "text", text: JSON.stringify({ ok: false, error: "no_targets_mapped_for_provider", provider: LIGHT_PROVIDER }) }] };
       }
 
