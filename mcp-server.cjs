@@ -76,13 +76,13 @@ function startTuyaPulse({ deviceId, theme, durationMs, periodMs = 450 }) {
   const timer = setInterval(() => {
     if (Date.now() >= stopAt) {
       stopTuyaPulse(deviceId);
-      // leave it steady
-      tuyaSend(deviceId, [{ code: "colour_data_v2", value: { ...base, v: 650 } }]).catch(() => {});
+            // leave it steady
+      tuyaSend(deviceId, [{ code: "colour_data", value: { ...base, v: 650 } }]).catch(() => {});
       return;
     }
     toggle = !toggle;
     const v = toggle ? lowV : highV;
-    tuyaSend(deviceId, [{ code: "colour_data_v2", value: { ...base, v } }]).catch(() => {});
+    tuyaSend(deviceId, [{ code: "colour_data", value: { ...base, v } }]).catch(() => {});
   }, periodMs);
 
   activePulses.set(deviceId, { timer });
