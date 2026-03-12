@@ -45,22 +45,28 @@ async function tuyaSend(deviceId, commands) {
   return res;
 }
 
-const THEMES = {
-  battery: { h: 180, s: 1000 }, // cyan
-  success: { h: 120, s: 1000 }, // green
-  default: { h: 210, s: 900 },  // blue-ish
-  gaming:  { h: 300, s: 1000 }, // magenta
+// Fallback themes if not defined in store config
+const DEFAULT_THEMES = {
+  default: { h: 210, s: 900  }, // blue
+  red:     { h: 0,   s: 1000 }, // red
+  orange:  { h: 30,  s: 1000 }, // orange
+  yellow:  { h: 60,  s: 1000 }, // yellow
 };
+
+function resolveTheme(storeCfg, themeName) {
+  const themes = storeCfg?.themes || DEFAULT_THEMES;
+  return themes[themeName] || themes.default || DEFAULT_THEMES.default;
+}
 
 // --- Add near the top (after THEMES) ---
 const activePulses = new Map(); // deviceId -> { timer }
 
 // Start pulsing without awaiting the full duration
-function startTuyaPulse({ deviceId, theme, durationMs, periodMs = 450 }) {
+function startTuyaPulse({ deviceId, theme, durationMs, periodMs = 450, storeCfg }) {
   // Stop any existing animation for that device first
   stopTuyaPulse(deviceId);
 
-  const base = THEMES[theme] || THEMES.default;
+  const base = resolveTheme(storeCfg, theme);
 
   const lowV = 150;
   const highV = 1000;
@@ -184,7 +190,7 @@ function createMcpServerForSession() {
           mode: z.enum(["light", "screen", "both"]).default("light"),
         })),
         effect: z.enum(["pulse", "off"]).default("pulse"),
-        theme: z.enum(["battery", "success", "default", "gaming"]).default("battery"),
+        theme: z.enum(["default", "red", "orange", "yellow"]).default("default"),
         duration_ms: z.number().int().min(1000).max(60000).default(15000),
       },
     },
@@ -274,13 +280,14 @@ function createMcpServerForSession() {
 
       console.log("Starting pulse for devices:", tuyaSelected.map(x => x.providerCfg.device_id));
 
-      tuyaSelected.forEach(x => {
+            tuyaSelected.forEach(x => {
         console.log(`Starting pulse for device ${x.providerCfg.device_id}`);
         startTuyaPulse({
           deviceId: x.providerCfg.device_id,
           theme: args.theme,
           durationMs: args.duration_ms,
           periodMs: 450,
+          storeCfg: cfg,
         });
       });
 

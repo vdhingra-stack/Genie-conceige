@@ -1,5 +1,11 @@
 {
   "store_id": "Default",
+  "themes": {
+    "default": { "h": 210, "s": 900  },
+    "red":     { "h": 0,   "s": 1000 },
+    "orange":  { "h": 30,  "s": 1000 },
+    "yellow":  { "h": 60,  "s": 1000 }
+  },
   "targets": {
     "82712501": {
       "providers": {
